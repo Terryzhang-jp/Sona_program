@@ -1,11 +1,25 @@
-import {Route, Redirect} from "react-router-dom"
-import {useContext} from "react"
-import AuthContext from "../context/AuthContext"
+import React from 'react';
+import { Route, Redirect } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Loading } from '../common';
 
+const PrivateRoute = ({ component: Component, ...rest }) => {
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const isLoading = useSelector((state) => state.auth.isLoading);
+  return (
+    <Route
+      {...rest}
+      render={(props) =>
+        isLoading ? (
+          <Loading />
+        ) : !isAuthenticated ? (
+          <Redirect to="/login" />
+        ) : (
+          <Component {...props} />
+        )
+      }
+    />
+  );
+};
 
-const PrivateRoute = ({children, ...rest}) => {
-    let {user} = useContext(AuthContext)
-    return <Route {...rest}>{!user ? <Redirect to="/login" /> : children}</Route>
-}
-
-export default PrivateRoute
+export default PrivateRoute;
